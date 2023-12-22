@@ -1,0 +1,62 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <SoftwareSerial.h>
+
+#define LCD_I2C_ADDRESS 0x27
+
+LiquidCrystal_I2C lcd(LCD_I2C_ADDRESS, 16, 2);
+SoftwareSerial bluetoothSerial(0, 1);
+
+String receivedMessage = "";
+
+const int ledPin = 8; // LED connected to digital pin 8
+
+void setup() {
+  Serial.begin(9600);
+  bluetoothSerial.begin(9600);
+  pinMode(ledPin, OUTPUT); // Set the LED pin as an output
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Ready!");
+}
+
+void loop() {
+  while (bluetoothSerial.available()) {
+    char receivedChar = (char)bluetoothSerial.read();
+    Serial.println(receivedChar);
+
+    if (receivedChar == '\n') {
+      // Remove the last character before displaying the message
+      if (receivedMessage.length() > 0) {
+        receivedMessage.remove(receivedMessage.length() - 1);
+      }
+
+      // Clear the LCD and display the new message
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(receivedMessage);
+
+      // Check if the message needs word wrapping
+      if (receivedMessage.length() > 16) {
+        int lastSpace = receivedMessage.lastIndexOf(' ', 15);
+        if (lastSpace != -1) {
+          // Move the last word to the next line
+          lcd.setCursor(0, 1);
+          lcd.print(receivedMessage.substring(lastSpace + 1));
+          receivedMessage = receivedMessage.substring(0, lastSpace);
+        }
+      }
+
+      // Light up the LED for 3 seconds
+      digitalWrite(ledPin, HIGH);
+      delay(3000);
+      digitalWrite(ledPin, LOW);
+
+      // Reset the received message buffer
+      receivedMessage = "";
+    } else {
+      receivedMessage += receivedChar;
+    }
+  }
+}
