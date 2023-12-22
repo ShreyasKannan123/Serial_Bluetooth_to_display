@@ -55,7 +55,6 @@ To set up and run this project:
 
 ## Acknowledgments
 
-Gratitude to the following individuals/projects for their contributions and inspiration:
+The following individuals co-created this project
 
-- [Acknowledged Individual/Project Name]: [Description of contribution or inspiration]
-- [Acknowledged Individual/Project Name]: [Description of contribution or inspiration]
+https://github.com/Algomaster0628
